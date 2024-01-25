@@ -20,7 +20,7 @@ func NewEmployerService(client *mongo.Database) *EmployerService {
 
 func (s *EmployerService) Create(employer models.Employer) error {
 	collection := s.client.Collection("employers")
-
+	employer.ID = primitive.NewObjectID()
 	_, err := collection.InsertOne(context.TODO(), employer)
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func (s *EmployerService) GetByUsername(username string) (models.Employer, error
 
 	collection := s.client.Collection("employers")
 
-	filter := bson.M{"username": username}
+	filter := bson.M{"name": username}
 	err := collection.FindOne(context.TODO(), filter).Decode(&employer)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {

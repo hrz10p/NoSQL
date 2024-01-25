@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"main/pkg/cookies"
 	"main/pkg/models"
 	"main/pkg/services"
@@ -36,7 +35,6 @@ func (app *Middle) Authenticate(next http.Handler) http.HandlerFunc {
 		objId, _ := primitive.ObjectIDFromHex(cookie.Value)
 
 		user, err := app.Service.EmployerService.Get(objId)
-		fmt.Println(user, "HERE")
 		if err != nil {
 			next.ServeHTTP(w, r)
 			return

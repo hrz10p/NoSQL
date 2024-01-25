@@ -18,14 +18,24 @@ func NewVacancyService(client *mongo.Database) *VacancyService {
 	return &VacancyService{client: client}
 }
 
-func (s *VacancyService) Create(obj models.Vacancy) error {
+func (s *VacancyService) Create(obj models.Vacancy) (models.Vacancy, error) {
 	collection := s.client.Collection("vacancies")
-
-	_, err := collection.InsertOne(context.TODO(), obj)
+	obj.ID = primitive.NewObjectID()
+	res, err := collection.InsertOne(context.TODO(), obj)
 	if err != nil {
-		return err
+		return models.Vacancy{}, err
 	}
-	return nil
+	id := res.InsertedID.(primitive.ObjectID)
+
+	filter := bson.M{"_id": id}
+	var createdVacancy models.Vacancy
+	err = collection.FindOne(context.TODO(), filter).Decode(&createdVacancy)
+	if err != nil {
+		log.Printf("Ошибка при получении созданного документа: %v", err)
+		return models.Vacancy{}, err
+	}
+
+	return createdVacancy, nil
 }
 
 func (s *VacancyService) Update(id primitive.ObjectID, updatedVacancy models.Vacancy) error {

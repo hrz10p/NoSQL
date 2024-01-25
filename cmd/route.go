@@ -1,20 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 )
 
 // InitializeRoutes sets up the application routes
 func (app *Application) InitializeRoutes() {
-
-	users, err := app.Service.EmployerService.GetAll()
-
-	if err != nil {
-		app.Logger.Error(err.Error())
-	}
-
-	fmt.Println(users)
 
 	emp := NewEmployerHandler(app.Service)
 	auth := NewAuthHandler(app.Service)
