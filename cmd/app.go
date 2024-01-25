@@ -57,12 +57,5 @@ func NewApplication() *Application {
 func (app *Application) Start(addr string) error {
 	app.Logger.Info("starting server... on localhost:8080")
 	app.InitializeRoutes()
-
-	obj, err := app.Service.VacancyService.GetAll()
-	if err != nil {
-		logger.GetLogger().Error(err.Error())
-	}
-
-	fmt.Println(obj)
 	return http.ListenAndServe(addr, app.Router)
 }
