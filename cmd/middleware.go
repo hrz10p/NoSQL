@@ -20,30 +20,10 @@ func NewMiddle(Service *services.Service) *Middle {
 
 // func (app *Middle) Authenticate(next http.Handler) http.HandlerFunc {
 // 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		cookie, err := cookies.GetCookie(r)
+// 		cookie, err := cookies.GetCookie(r, "session")
 // 		if err != nil {
 // 			next.ServeHTTP(w, r)
 // 			return
-// 		}
-
-// 		session, err := app.Service.SessionService.GetSessionByID(cookie.Value)
-// 		if err != nil {
-// 			cookies.DeleteCookie(w)
-// 			next.ServeHTTP(w, r)
-// 			return
-// 		}
-
-// 		if session.ExpireTime.Before(time.Now()) {
-// 			cookies.DeleteCookie(w)
-// 			next.ServeHTTP(w, r)
-// 			return
-// 		}
-
-// 		user, err := app.Service.UserService.GetUserByID(session.UID)
-// 		if err != nil {
-// 			cookies.DeleteCookie(w)
-// 			app.Service.SessionService.DeleteSessionByID(cookie.Value)
-// 			next.ServeHTTP(w, r)
 // 		}
 
 // 		ctx := context.WithValue(r.Context(), contextKeyUser, user)
@@ -53,8 +33,9 @@ func NewMiddle(Service *services.Service) *Middle {
 
 // func (app *Middle) RequireAuthentication(next http.Handler) http.Handler {
 // 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		user := getUserFromContext(r)
-// 		if (user == models.User{}) {
+// 		emp := getEmployerFromContext(r)
+// 		app := getApplicantFromContext(r)
+// 		if emp == nil && app == nil {
 // 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 // 			return
 // 		}
@@ -91,11 +72,18 @@ func NewMiddle(Service *services.Service) *Middle {
 // 	})
 // }
 
-// func getUserFromContext(r *http.Request) models.User {
-// 	user, ok := r.Context().Value(contextKeyUser).(models.User)
+// func getEmployerFromContext(r *http.Request) *models.Employer {
+// 	user, ok := r.Context().Value(contextKeyUser).(models.Employer)
 // 	if !ok {
-// 		logger.GetLogger().Info("User is not authenticated")
-// 		return models.User{}
+// 		return nil
 // 	}
-// 	return user
+// 	return &user
+// }
+
+// func getApplicantFromContext(r *http.Request) *models.Applicant {
+// 	user, ok := r.Context().Value(contextKeyUser).(models.Applicant)
+// 	if !ok {
+// 		return nil
+// 	}
+// 	return &user
 // }

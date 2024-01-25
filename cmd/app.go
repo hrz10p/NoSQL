@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"main/pkg/logger"
 	"main/pkg/services"
@@ -9,6 +10,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -27,16 +29,21 @@ func NewApplication() *Application {
 	if uri == "" {
 		log.Fatal("You must set your 'MONGODB_URI' environment variable.")
 	}
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
+
+	// Create a new client and connect to the server
+	client, err := mongo.Connect(context.TODO(), opts)
 	if err != nil {
 		panic(err)
 	}
-	logger.GetLogger().Info("Connected to MongoDB!")
-	defer func() {
-		if err := client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-	}()
+
+	// Send a ping to confirm a successful connection
+	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Err(); err != nil {
+		panic(err)
+	}
+	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
 
 	router := http.NewServeMux()
 
@@ -50,5 +57,12 @@ func NewApplication() *Application {
 func (app *Application) Start(addr string) error {
 	app.Logger.Info("starting server... on localhost:8080")
 	app.InitializeRoutes()
+
+	obj, err := app.Service.VacancyService.GetAll()
+	if err != nil {
+		logger.GetLogger().Error(err.Error())
+	}
+
+	fmt.Println(obj)
 	return http.ListenAndServe(addr, app.Router)
 }

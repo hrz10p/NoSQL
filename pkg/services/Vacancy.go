@@ -6,6 +6,7 @@ import (
 	"main/pkg/models"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -17,44 +18,76 @@ func NewVacancyService(client *mongo.Database) *VacancyService {
 	return &VacancyService{client: client}
 }
 
-func (s *VacancyService) create(obj models.Vacancy) {
+func (s *VacancyService) Create(obj models.Vacancy) error {
 	collection := s.client.Collection("vacancies")
 
 	_, err := collection.InsertOne(context.TODO(), obj)
 	if err != nil {
-		log.Fatal(err)
+		return err
+	}
+	return nil
+}
+
+func (s *VacancyService) Update(id primitive.ObjectID, updatedVacancy models.Vacancy) error {
+	collection := s.client.Collection("vacancies")
+
+	filter := bson.M{"_id": id}
+	update := bson.M{"$set": updatedVacancy}
+
+	_, err := collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Printf("Ошибка при обновлении документа: %v", err)
+		return err
 	}
 
+	return nil
 }
 
-func (s *VacancyService) update() {
+func (s *VacancyService) Delete(id primitive.ObjectID) error {
+	collection := s.client.Collection("vacancies")
 
+	filter := bson.M{"_id": id}
+
+	_, err := collection.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		log.Printf("Ошибка при удалении документа: %v", err)
+		return err
+	}
+
+	return nil
 }
 
-func (s *VacancyService) delete() {
+func (s *VacancyService) Get(id primitive.ObjectID) (models.Vacancy, error) {
+	var vacancy models.Vacancy
 
-}
+	collection := s.client.Collection("vacancies")
 
-func (s *VacancyService) get() {
+	filter := bson.M{"_id": id}
 
+	err := collection.FindOne(context.TODO(), filter).Decode(&vacancy)
+	if err != nil {
+		log.Printf("Ошибка при получении документа: %v", err)
+		return models.Vacancy{}, err
+	}
+
+	return vacancy, nil
 }
 
 func (s *VacancyService) GetAll() ([]models.Vacancy, error) {
 	var vacancies []models.Vacancy
 
-	// Создаем контекст для выполнения операции ввода/вывода
-	ctx := context.TODO()
+	collection := s.client.Collection("vacancies")
 
 	// Выполняем запрос ко всем документам в коллекции
-	cursor, err := s.client.Collection("vacancies").Find(ctx, bson.M{})
+	cursor, err := collection.Find(context.TODO(), bson.M{})
 	if err != nil {
 		log.Printf("Ошибка при выполнении запроса: %v", err)
 		return nil, err
 	}
-	defer cursor.Close(ctx)
+	defer cursor.Close(context.TODO())
 
 	// Итерируемся по результатам запроса
-	for cursor.Next(ctx) {
+	for cursor.Next(context.TODO()) {
 		var vacancy models.Vacancy
 		if err := cursor.Decode(&vacancy); err != nil {
 			log.Printf("Ошибка при декодировании документа: %v", err)

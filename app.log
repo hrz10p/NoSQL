@@ -13,3 +13,15 @@
 [2024-01-25 15:28:37] INFO: Connected to MongoDB!
 [2024-01-25 15:28:37] INFO: starting server... on localhost:8080
 [2024-01-25 15:28:37] ERROR: client is disconnected
+[2024-01-25 15:33:28] INFO: Connected to MongoDB!
+[2024-01-25 15:33:28] INFO: starting server... on localhost:8080
+[2024-01-25 15:33:28] ERROR: client is disconnected
+[2024-01-25 15:36:52] INFO: starting server... on localhost:8080
+[2024-01-25 15:36:52] ERROR: client is disconnected
+[2024-01-25 15:39:00] INFO: starting server... on localhost:8080
+[2024-01-25 15:40:09] INFO: starting server... on localhost:8080
+[2024-01-25 15:40:09] ERROR: client is disconnected
+[2024-01-25 15:41:21] INFO: starting server... on localhost:8080
+[2024-01-25 15:41:21] ERROR: error decoding key applicants.0: cannot decode 32-bit integer into an ObjectID
+[2024-01-25 15:44:17] INFO: starting server... on localhost:8080
+[2024-01-25 15:45:32] INFO: starting server... on localhost:8080

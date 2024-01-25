@@ -5,11 +5,7 @@ import (
 	"time"
 )
 
-const (
-	cookieName = "GSESSIONID"
-)
-
-func SetCookie(w http.ResponseWriter, value string, maxAge time.Time) {
+func SetCookie(w http.ResponseWriter, value string, maxAge time.Time, cookieName string) {
 	cookie := &http.Cookie{
 		Name:     cookieName,
 		Value:    value,
@@ -20,7 +16,7 @@ func SetCookie(w http.ResponseWriter, value string, maxAge time.Time) {
 	http.SetCookie(w, cookie)
 }
 
-func GetCookie(r *http.Request) (*http.Cookie, error) {
+func GetCookie(r *http.Request, cookieName string) (*http.Cookie, error) {
 	cookie, err := r.Cookie(cookieName)
 	if err != nil {
 		return nil, err
@@ -28,7 +24,7 @@ func GetCookie(r *http.Request) (*http.Cookie, error) {
 	return cookie, nil
 }
 
-func DeleteCookie(w http.ResponseWriter) {
+func DeleteCookie(w http.ResponseWriter, cookieName string) {
 	cookie := &http.Cookie{
 		Name:     cookieName,
 		Value:    "",
